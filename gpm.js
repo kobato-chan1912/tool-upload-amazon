@@ -6,7 +6,7 @@ const sleep = ms => new Promise(res => setTimeout(res, ms));
 function processCategories(text) {
     // Remove "Books ›" from the text
     let cleanedText;
-    if (text.includes("Books ›")) {
+    if (!text.includes("Kindle Books ›")) {
         cleanedText = text.replace(/Books ›/g, '');
 
     } else {
@@ -339,13 +339,10 @@ async function solveCategory(page, categoryText) {
         await page.waitForSelector("#print-preview-confirm-button-announce", { timeout: 5000 })
         await sleep(3000)
         await page.evaluate(() => {
-            console.log("CLICK")
             document.querySelector('#print-preview-confirm-button-announce').click();
-            console.log("ĐÃ CLICK")
         });
 
     } catch (error) {
-        console.log("Ko có cảnh báo: " + error)
     }
 
 
@@ -381,6 +378,7 @@ async function solveCategory(page, categoryText) {
 
 
     /////// Upload Kindle Book ////// 
+
 
     if (book['manuscript ebook'] !== '') {
         await page.click("span[data-action=add-digital-format]")
@@ -445,23 +443,24 @@ async function solveCategory(page, categoryText) {
 
         await sleep(3000)
         let priceEbook = book['price_ebook'].toString()
-        await page.type("#data-pricing-print-us-price-input > input", priceEbook, { delay: 50 })
+        await page.type("#data-digital-us-price-input > input", priceEbook, { delay: 50 })
         await sleep(3000)
         await page.click("#save-and-publish-announce")
 
 
         await page.waitForSelector("#publish-confirm-popover-digital-done > span > input")
         await sleep(3000)
-        await page.click("#publish-confirm-popover-digital-done > span > input")
+        await page.click("#a-popover-1 > div > header > button")
         await sleep(5000)
     }
 
 
 
+    await page.goto("https://kdp.amazon.com/en_US/bookshelf?ref_=kdp_kdp_TAC_TN_bs")
 
     // Upload hardcover 
-    await page.waitForSelector("span[data-action=add-digital-format]")
-    await page.click("span[data-action=add-digital-format]")
+    await page.waitForSelector("span[data-action=add-hardcover-format]")
+    await page.click("span[data-action=add-hardcover-format]")
     await page.waitForSelector("#save-and-continue-announce")
     await sleep(3000)
     await page.click("#save-and-continue-announce")
@@ -474,7 +473,7 @@ async function solveCategory(page, categoryText) {
     await sleep(5000)
 
     // hardcover book
-    let hardcoverFile = book['manuscript Hard Cover']
+    let hardcoverFile = book['cover Hardcover']
     await page.click("#data-print-book-publisher-cover-choice-accordion > div.a-box.a-last > div > div.a-accordion-row-a11y > a")
     await sleep(3000)
     const hardcoverBook = await page.waitForSelector('#data-print-book-publisher-cover-file-upload-AjaxInput');
@@ -494,12 +493,11 @@ async function solveCategory(page, categoryText) {
 
     try {
         await page.waitForSelector("#print-preview-confirm-button-announce", { timeout: 5000 })
-        console.log("can click")
+        await sleep(3000)
         await page.evaluate(() => {
             document.querySelector('#print-preview-confirm-button-announce').click();
         });
     } catch (error) {
-        console.log("err: " + error)
     }
 
     await page.waitForSelector("#printpreview_approve_button_enabled > span", { timeout: 300000 })
