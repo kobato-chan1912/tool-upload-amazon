@@ -191,7 +191,7 @@ async function run(data) {
 
     }
 
-    for (let book in data.books) {
+    for (let book of data.books) {
 
         // 1 - Upload paperback
 
