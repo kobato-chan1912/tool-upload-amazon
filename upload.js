@@ -1,6 +1,7 @@
 const Genlogin = require('./Genlogin');
 const puppeteer = require('puppeteer-core');
 const sleep = ms => new Promise(res => setTimeout(res, ms));
+const speakeasy = require('speakeasy');
 
 
 function processCategories(text) {

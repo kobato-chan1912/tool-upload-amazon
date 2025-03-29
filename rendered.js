@@ -4,7 +4,7 @@ const fsPromise = require('fs').promises
 const $ = require('jquery')
 const { ipcRenderer, webUtils } = require('electron');
 const excel = require("./excel.js")
-
+const { exec } = require('child_process');
 
 function getFilePath(id) {
     if ($("#" + id)[0].files.length === 0) {
@@ -13,6 +13,24 @@ function getFilePath(id) {
         return webUtils.getPathForFile($("#" + id)[0].files[0]);
     }
 }
+
+function runNodeFile() {
+    const nodeFilePath = path.join(__dirname, 'run.js');
+  
+    // Platform-specific commands
+    let command;
+    if (process.platform === 'darwin') {
+      command = `osascript -e 'tell application "Terminal" to do script "node \\"${nodeFilePath}\\""'`;
+    } else if (process.platform === 'win32') {
+      command = `start cmd.exe /K "node ${nodeFilePath}"`;
+    } else {
+      command = `x-terminal-emulator -e "node \\"${nodeFilePath}\\""`;
+    }
+  
+    console.log(command);
+    exec(command);
+  }
+  
 
 async function loadAccount() {
     let accountPath = getFilePath("account_file");
@@ -83,7 +101,7 @@ async function saveSelectedAccounts() {
 
     let savePath = path.join(__dirname, "configs.json");
     await fsPromise.writeFile(savePath, JSON.stringify(configs, null, 2), "utf-8");
-    
+    runNodeFile()
 
 
 }

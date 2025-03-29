@@ -3,8 +3,10 @@ const path = require('path');
 const pLimit = require('p-limit');
 const upload = require('./upload.js'); // Import file upload.js
 
+
 async function run() {
     try {
+        console.log(" -- Để tắt tool ấn ctrl + c -- \n")
         // 1️⃣ Đọc file configs.json
         let configPath = path.join(__dirname, 'configs.json');
         let rawData = await fs.readFile(configPath, 'utf-8');
