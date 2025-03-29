@@ -70,6 +70,8 @@ async function saveSelectedAccounts() {
     let resultFilter = selectedAccounts.map(account => ({
         email: account["tài khoản"],
         gpm_id: account.gpm_id,
+        password: account["mật khẩu"],
+        secret: account["2FA"],
         books: booksData.filter(item => item.email === account["tài khoản"])
     }));
 

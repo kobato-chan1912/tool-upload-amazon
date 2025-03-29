@@ -22,7 +22,7 @@ async function run() {
         let limit = pLimit(data.length); // Số luồng = số phần tử trong `data`
 
         let uploadTasks = data.map(account =>
-            limit(() => upload.run(account.gpm_id, account.books))
+            limit(() => upload.run(account))
         );
 
         // 4️⃣ Đợi tất cả hoàn thành
