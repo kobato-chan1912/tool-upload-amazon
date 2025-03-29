@@ -352,7 +352,7 @@ async function run(data) {
         await sleep(5000)
         let price = book["price paperpack"].toString()
         await page.type("#data-pricing-print-us-price-input > input", price, { delay: 50 })
-        await sleep(3000)
+        await sleep(7000)
         await page.click("#save-and-publish-announce")
 
         await page.waitForSelector("#publish-confirm-popover-print-start")
@@ -435,7 +435,7 @@ async function run(data) {
             await sleep(3000)
             let priceEbook = book['price_ebook'].toString()
             await page.type("#data-digital-us-price-input > input", priceEbook, { delay: 50 })
-            await sleep(3000)
+            await sleep(7000)
             await page.click("#save-and-publish-announce")
 
 
@@ -501,7 +501,7 @@ async function run(data) {
         await sleep(3000)
         let hardcoverPrice = book['Price Harcover'].toString()
         await page.type("#data-pricing-print-us-price-input > input", hardcoverPrice, { delay: 50 })
-        await sleep(3000)
+        await sleep(7000)
         await page.click("#save-and-publish-announce")
         await page.waitForSelector("#publish-confirm-popover-hardcover-done")
         console.log(`--- Upload ${book["book title"]} done ---`)
