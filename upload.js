@@ -141,45 +141,47 @@ async function solveCategory(page, categoryText) {
 
 async function run(data) {
 
+    const profileID = data.gpm_id
+    let browser;
+
     if (process.platform === 'win32') {
 
         // Windows - Using GPM-Login 
 
         const API_BASE_URL = "http://127.0.0.1:19995/api/v3"; // Địa chỉ API GPM-Login
-        const startResponse = await axios.get(`${API_BASE_URL}/profiles/start/${profile.id}`);
+        const startResponse = await axios.get(`${API_BASE_URL}/profiles/start/${profileID}`);
         if (!startResponse.data.success) {
-            throw new Error(`Không thể mở profile ${profile.name}: ${startResponse.data.message}`);
+            throw new Error(`Không thể mở profile: ${startResponse.data.message}`);
         }
 
         const { remote_debugging_address } = startResponse.data.data;
         await new Promise(resolve => setTimeout(resolve, 5000));
-        const browser = await puppeteer.connect({
+        browser = await puppeteer.connect({
             browserURL: `http://${remote_debugging_address}`,
             defaultViewport: null,
         });
-        const page = await browser.newPage();
-        page.setDefaultTimeout(300000);
+
 
     } else {
         // MAC OS - Using GenLogin
 
         const genlogin = new Genlogin("");
-        const { wsEndpoint } = await genlogin.runProfile(data.gpm_id)
+        const { wsEndpoint } = await genlogin.runProfile(profileID)
 
-        const browser = await puppeteer.connect({
+        browser = await puppeteer.connect({
             browserWSEndpoint: wsEndpoint,
             ignoreHTTPSErrors: true,
             defaultViewport: false
         });
-        const page = await browser.newPage();
-        page.setDefaultTimeout(300000);
+
     }
 
 
     try {
 
         // login
-
+        const page = await browser.newPage();
+        page.setDefaultTimeout(300000);
         await page.goto("https://kdp.amazon.com/bookshelf ")
         await sleep(3000)
         await page.type("#ap_email", data.email, { delay: 50 })
