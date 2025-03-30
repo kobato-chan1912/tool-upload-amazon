@@ -16,21 +16,21 @@ function getFilePath(id) {
 
 function runNodeFile() {
     const nodeFilePath = path.join(__dirname, 'run.js');
-  
+
     // Platform-specific commands
     let command;
     if (process.platform === 'darwin') {
-      command = `osascript -e 'tell application "Terminal" to do script "node \\"${nodeFilePath}\\""'`;
+        command = `osascript -e 'tell application "Terminal" to do script "node \\"${nodeFilePath}\\""'`;
     } else if (process.platform === 'win32') {
-      command = `start cmd.exe /K "node ${nodeFilePath}"`;
+        command = `start cmd.exe /K "node ${nodeFilePath}"`;
     } else {
-      command = `x-terminal-emulator -e "node \\"${nodeFilePath}\\""`;
+        command = `x-terminal-emulator -e "node \\"${nodeFilePath}\\""`;
     }
-  
+
     console.log(command);
     exec(command);
-  }
-  
+}
+
 
 async function loadAccount() {
     let accountPath = getFilePath("account_file");
@@ -93,15 +93,32 @@ async function saveSelectedAccounts() {
         books: booksData.filter(item => item.email === account["tài khoản"])
     }));
 
+    let logFileName = `log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`;
+    let logFilePath = path.join(__dirname, logFileName);
+
     let configs = {
         accountsFile: getFilePath("account_file"),
         booksFile: booksPath,
-        data: resultFilter
+        data: resultFilter,
+        typingTime: {
+            min: Number(document.getElementById("typing_min").value) || 0,
+            max: Number(document.getElementById("typing_max").value) || 0
+        },
+        actionTime: {
+            min: Number(document.getElementById("action_min").value) || 0,
+            max: Number(document.getElementById("action_max").value) || 0
+        },
+        uploadInterval: {
+            min: Number(document.getElementById("upload_min").value) || 0,
+            max: Number(document.getElementById("upload_max").value) || 0
+        },
+        logFile: logFilePath
+
     }
 
     let savePath = path.join(__dirname, "configs.json");
     await fsPromise.writeFile(savePath, JSON.stringify(configs, null, 2), "utf-8");
-    runNodeFile()
+    // runNodeFile()
 
 
 }

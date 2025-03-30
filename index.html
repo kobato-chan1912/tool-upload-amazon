@@ -34,46 +34,48 @@
             <button onclick="loadAccount()" id="loadAccount" class="btn btn-primary">Load Account</button>
         </div>
 
-        <div class="mb-3" id="list_accounts"></div>
+        
 
         <!-- Thời gian gõ tay -->
         <div class="mb-3">
             <label class="form-label">Thời gian gõ tay (ms)</label>
             <div class="row">
                 <div class="col">
-                    <input type="number" id="typing_min" class="form-control" placeholder="Min">
+                    <input type="number" value="50" id="typing_min" class="form-control" placeholder="Min">
                 </div>
                 <div class="col">
-                    <input type="number" id="typing_max" class="form-control" placeholder="Max">
+                    <input type="number" value="60" id="typing_max" class="form-control" placeholder="Max">
                 </div>
             </div>
         </div>
 
         <!-- Random thời gian thao tác -->
         <div class="mb-3">
-            <label class="form-label">Random thời gian thao tác (ms)</label>
+            <label class="form-label">Random thời gian thao tác (s)</label>
             <div class="row">
                 <div class="col">
-                    <input type="number" id="action_min" class="form-control" placeholder="Min">
+                    <input type="number" value="10" id="action_min" class="form-control" placeholder="Min">
                 </div>
                 <div class="col">
-                    <input type="number" id="action_max" class="form-control" placeholder="Max">
+                    <input type="number"  value="20" id="action_max" class="form-control" placeholder="Max">
                 </div>
             </div>
         </div>
 
         <!-- Random thời gian khoảng cách giữa các lần upload -->
         <div class="mb-3">
-            <label class="form-label">Random thời gian khoảng cách giữa các lần up (ms)</label>
+            <label class="form-label">Random thời gian khoảng cách giữa các lần up (s)</label>
             <div class="row">
                 <div class="col">
-                    <input type="number" id="upload_min" class="form-control" placeholder="Min">
+                    <input type="number"  value="50"  id="upload_min" class="form-control" placeholder="Min">
                 </div>
                 <div class="col">
-                    <input type="number" id="upload_max" class="form-control" placeholder="Max">
+                    <input type="number"  value="100"  id="upload_max" class="form-control" placeholder="Max">
                 </div>
             </div>
         </div>
+
+        <div class="mb-3" id="list_accounts"></div>
 
         <div class="mb-3" id="run_btn" style="display: none;">
             <button onclick="saveSelectedAccounts()" id="saveAccounts" class="btn btn-success">Chạy</button>
