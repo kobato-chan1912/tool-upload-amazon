@@ -18,31 +18,67 @@
 <body>
 
     <div class="container mt-5">
-        <h3 class="mb-3">Tool Upload AMZ</h2>
+        <h3 class="mb-3">Tool Upload AMZ</h3>
 
-            <div class="mb-3">
-                <label for="account_file" class="form-label">Chọn File Account</label>
-                <input class="form-control" id="account_file" type="file" accept=".xlsx, .xls">
+        <div class="mb-3">
+            <label for="account_file" class="form-label">Chọn File Account</label>
+            <input class="form-control" id="account_file" type="file" accept=".xlsx, .xls">
+        </div>
+
+        <div class="mb-3">
+            <label for="data_file" class="form-label">Chọn File Data Sách</label>
+            <input class="form-control" id="data_file" type="file" accept=".xlsx, .xls">
+        </div>
+
+        <div class="mb-3">
+            <button onclick="loadAccount()" id="loadAccount" class="btn btn-primary">Load Account</button>
+        </div>
+
+        <div class="mb-3" id="list_accounts"></div>
+
+        <!-- Thời gian gõ tay -->
+        <div class="mb-3">
+            <label class="form-label">Thời gian gõ tay (ms)</label>
+            <div class="row">
+                <div class="col">
+                    <input type="number" id="typing_min" class="form-control" placeholder="Min">
+                </div>
+                <div class="col">
+                    <input type="number" id="typing_max" class="form-control" placeholder="Max">
+                </div>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <label for="data_file" class="form-label">Chọn File Data Sách</label>
-                <input class="form-control" id="data_file" type="file" accept=".xlsx, .xls">
+        <!-- Random thời gian thao tác -->
+        <div class="mb-3">
+            <label class="form-label">Random thời gian thao tác (ms)</label>
+            <div class="row">
+                <div class="col">
+                    <input type="number" id="action_min" class="form-control" placeholder="Min">
+                </div>
+                <div class="col">
+                    <input type="number" id="action_max" class="form-control" placeholder="Max">
+                </div>
             </div>
+        </div>
 
-            <div class="mb-3">
-                <button onclick="loadAccount()" id="loadAccount" class="btn btn-primary">Load Account</button>
+        <!-- Random thời gian khoảng cách giữa các lần upload -->
+        <div class="mb-3">
+            <label class="form-label">Random thời gian khoảng cách giữa các lần up (ms)</label>
+            <div class="row">
+                <div class="col">
+                    <input type="number" id="upload_min" class="form-control" placeholder="Min">
+                </div>
+                <div class="col">
+                    <input type="number" id="upload_max" class="form-control" placeholder="Max">
+                </div>
             </div>
+        </div>
 
-            <div class="mb-3" id="list_accounts"></div>
-
-            <div class="mb-3" id="run_btn" style="display: none;">
-                <button onclick="saveSelectedAccounts()" id="saveAccounts" class="btn btn-success">Chạy</button>
-            </div>
-
+        <div class="mb-3" id="run_btn" style="display: none;">
+            <button onclick="saveSelectedAccounts()" id="saveAccounts" class="btn btn-success">Chạy</button>
+        </div>
     </div>
-
-
 
     <script
         src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>

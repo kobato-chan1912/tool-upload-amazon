@@ -56,6 +56,14 @@ async function selectCategory(page, selectName, textSearch) {
     }, selectName, textSearch);
 }
 
+async function clearInput(page, selector) {
+    await page.focus(selector);
+    await page.keyboard.down('Control');
+    await page.keyboard.press('A');
+    await page.keyboard.up('Control');
+    await page.keyboard.press('Backspace');
+
+}
 
 async function selectPlacement(page, textSearch) {
     await page.evaluate((textSearch) => {
@@ -114,8 +122,10 @@ async function solveCategory(page, categoryText) {
             await sleep(5000)
         }
 
-        if (category.mainCategory == "Non-Classifiable") {
-            await selectPlacement(page, "Non-Classifiable")
+        if (category.mainCategory == "Non-Classifiable" ||
+            category.mainCategory == "Classics" ||
+            category.mainCategory == "General") {
+            await selectPlacement(page, category.mainCategory)
             await sleep(5000)
         }
 
@@ -183,10 +193,14 @@ async function run(data) {
 
         // login
         await sleep(3000)
+        await clearInput(page, "#ap_email")
+        await sleep(2000)
         await page.type("#ap_email", data.email, { delay: 50 })
         await page.click("#continue")
         await page.waitForSelector("#ap_password", { timeout: 20000 })
         await sleep(3000)
+        await clearInput(page, "#ap_password")
+        await sleep(2000)
         await page.type("#ap_password", data.password, { delay: 50 })
         await page.click("#signInSubmit")
         await page.waitForSelector("#auth-get-new-otp-link", { timeout: 20000 })
