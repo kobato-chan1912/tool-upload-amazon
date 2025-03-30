@@ -19,16 +19,16 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function randomTypeTime(data) {
-    return getRandomInt(data.typingTime.min, data.typingTime.max);
+function randomTypeTime(config) {
+    return getRandomInt(config.typingTime.min, config.typingTime.max);
 }
 
-function randomActionTime(data) {
-    return getRandomInt(data.actionTime.min * 1000, data.actionTime.max * 1000);
+function randomActionTime(config) {
+    return getRandomInt(config.actionTime.min * 1000, config.actionTime.max * 1000);
 }
 
-function randomUploadInterval(data) {
-    return getRandomInt(data.uploadInterval.min * 1000, data.uploadInterval.max * 1000);
+function randomUploadInterval(config) {
+    return getRandomInt(config.uploadInterval.min * 1000, config.uploadInterval.max * 1000);
 }
 
 
@@ -177,9 +177,8 @@ async function solveCategory(page, categoryText) {
 }
 
 
-async function run(data) {
-
-    const logFilePath = data.logFile;
+async function run(data, configs) {
+    const logFilePath = configs.logFile;
     const profileID = data.gpm_id
     let browser;
 
@@ -225,13 +224,13 @@ async function run(data) {
         await sleep(3000)
         await clearInput(page, "#ap_email")
         await sleep(2000)
-        await page.type("#ap_email", data.email, { delay: randomTypeTime(data) })
+        await page.type("#ap_email", data.email, { delay: randomTypeTime(configs) })
         await page.click("#continue")
         await page.waitForSelector("#ap_password", { timeout: 20000 })
         await sleep(3000)
         await clearInput(page, "#ap_password")
         await sleep(2000)
-        await page.type("#ap_password", data.password, { delay: randomTypeTime(data) })
+        await page.type("#ap_password", data.password, { delay: randomTypeTime(configs) })
         await page.click("#signInSubmit")
         await page.waitForSelector("#auth-get-new-otp-link", { timeout: 20000 })
         await sleep(3000)
@@ -253,7 +252,7 @@ async function run(data) {
 
         await page.waitForSelector("#auth-mfa-otpcode", { timeout: 20000 })
         await sleep(3000)
-        await page.type("#auth-mfa-otpcode", token, { delay: randomTypeTime(data) })
+        await page.type("#auth-mfa-otpcode", token, { delay: randomTypeTime(configs) })
         await page.click("#auth-signin-button")
         await sleep(10000)
 
@@ -277,36 +276,36 @@ async function run(data) {
             // await page.setViewport({ width: 1280, height: 720 });
 
             // Điền book-title 
-            await page.type("#data-print-book-title", book["book title"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-subtitle", book["sub title"], { delay: randomTypeTime(data) })
+            await page.type("#data-print-book-title", book["book title"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-subtitle", book["sub title"], { delay: randomTypeTime(configs) })
 
 
             await page.type("#data-print-book-primary-author-last-name", book["author (last name)"], { delay: 50 })
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
 
             await page.$eval('#cke_editor1', (el, description) => {
                 CKEDITOR.instances['editor1'].setData(description);
             }, book["description"]);
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
 
-            await page.type("#data-print-book-keywords-0", book["keyword1"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-1", book["keyword2"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-2", book["keyword3"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-3", book["keyword4"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-4", book["keyword5"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-5", book["keyword6"], { delay: randomTypeTime(data) })
-            await sleep(randomActionTime(data))
-            await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(data) })
+            await page.type("#data-print-book-keywords-0", book["keyword1"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-1", book["keyword2"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-2", book["keyword3"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-3", book["keyword4"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-4", book["keyword5"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-5", book["keyword6"], { delay: randomTypeTime(configs) })
+            await sleep(randomActionTime(configs))
+            await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(configs) })
 
             // Chọn non-public
             await page.click("#non-public-domain")
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
 
             // Cài đặt adult mode
             let adult = book["adult"];
@@ -347,7 +346,7 @@ async function run(data) {
             if (lowContent == "NO") {
                 await page.click("#section-isbn-v2 .a-button-input")
                 await sleep(3000)
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#free-isbn-confirm-button > span > input")
                 await page.sleep(10000)
             }
@@ -363,25 +362,25 @@ async function run(data) {
             if (formatTrim.w !== 6 || formatTrim.h !== 9) {
                 await page.click("#trim-size-btn-announce")
                 await sleep(3000)
-                await page.type("#inputWidth", formatTrim.w, { delay: randomTypeTime(data) })
-                await page.type("#inputHeight", formatTrim.h, { delay: randomTypeTime(data) })
+                await page.type("#inputWidth", formatTrim.w, { delay: randomTypeTime(configs) })
+                await page.type("#inputHeight", formatTrim.h, { delay: randomTypeTime(configs) })
                 await page.click("#a-autoid-11 > span > input")
                 await sleep(3000)
             }
 
             let bleedSetting = book["bleed setting"];
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click(`#a-autoid-${bleedSetting + 3}-announce`)
 
             let paperCover = book["paperback cover"];
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click(`#a-autoid-${paperCover + 5}-announce`)
 
             // Manual Script Upload
 
             let manualScript = book["manuscript paperback"]
             const manualScriptUpload = await page.waitForSelector('#data-print-book-publisher-interior-file-upload-AjaxInput');
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await manualScriptUpload.uploadFile(manualScript);
             await page.waitForSelector("#data-print-book-publisher-interior-file-upload-success", { visible: true })
             await sleep(5000)
@@ -407,7 +406,7 @@ async function run(data) {
             await sleep(10000)
             await page.waitForSelector("#print-preview-announce:not([disabled]")
             await sleep(3000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             // await page.click("#print-preview-announce") // not worked
             await page.evaluate(() => {
                 document.querySelector('#print-preview-announce').click();
@@ -428,11 +427,11 @@ async function run(data) {
 
             await page.waitForSelector("#printpreview_approve_button_enabled > span > a")
             await sleep(10000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#printpreview_approve_button_enabled > span > a")
             await page.waitForSelector("#save-and-continue-announce")
             await sleep(5000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#save-and-continue-announce")
 
 
@@ -442,9 +441,9 @@ async function run(data) {
             await page.waitForSelector(".price-input")
             await sleep(5000)
             let price = book["price paperpack"].toString()
-            await page.type("#data-pricing-print-us-price-input > input", price, { delay: randomTypeTime(data) })
+            await page.type("#data-pricing-print-us-price-input > input", price, { delay: randomTypeTime(configs) })
             await sleep(7000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#save-and-publish-announce")
 
             await page.waitForSelector("#publish-confirm-popover-print-start")
@@ -453,7 +452,7 @@ async function run(data) {
 
 
             // Ấn close để về lại màn hình
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#a-popover-1 > div > header > button") // ALERT: chỗ này ấn close 
             await page.waitForSelector("span[data-action=add-digital-format]")
             await sleep(5000)
@@ -464,7 +463,7 @@ async function run(data) {
 
 
             if (book['manuscript ebook'] !== '') {
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("span[data-action=add-digital-format]")
                 await page.waitForSelector("#save-and-continue-announce")
                 await sleep(5000)
@@ -474,7 +473,7 @@ async function run(data) {
                 let categoryKindleBook = book["category ebooks"]
                 await solveCategory(page, categoryKindleBook)
 
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#save-and-continue-announce")
                 await sleep(5000)
 
@@ -501,20 +500,20 @@ async function run(data) {
                 // Ebook cover
 
                 let coverEbook = book['cover ebook']
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#data-cover-choice-accordion > div.a-box.a-last > div > div.a-accordion-row-a11y > a > i")
                 await sleep(3000)
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 const ebookCoverUpload = await page.waitForSelector('#data-assets-cover-file-upload-AjaxInput');
                 await ebookCoverUpload.uploadFile(coverEbook);
                 await page.waitForSelector("#data-assets-cover-file-upload-success", { visible: true })
                 await sleep(5000)
 
                 // No AI 
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#form-main-1 > div > div:nth-child(62) > div > div.a-column.a-span10.a-span-last > div > div > div > span > div:nth-child(3) > div > div:nth-child(2) > div > div > a")
                 await sleep(3000)
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#save-and-continue-announce")
 
 
@@ -522,7 +521,7 @@ async function run(data) {
                 await sleep(5000)
 
                 //  Chỉnh giá royalty 
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 let royalty = book['Royalty Ebook']
                 if (royalty == '70%' || royalty == 0.7) {
                     await page.click("#data-digital-royalty-rate > div > div > fieldset > div.a-radio.a-radio-fancy.form-submit-blacklisted.form-incr-validate-blacklist.jele-binding-disabled.unsaved-changes-ignore.a-spacing-none > label > input[type=radio]")
@@ -533,11 +532,11 @@ async function run(data) {
 
                 await sleep(3000)
                 let priceEbook = book['price_ebook'].toString()
-                await page.type("#data-digital-us-price-input > input", priceEbook, { delay: randomTypeTime(data) })
+                await page.type("#data-digital-us-price-input > input", priceEbook, { delay: randomTypeTime(configs) })
                 await sleep(7000)
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
                 await page.click("#save-and-publish-announce")
-                await sleep(randomActionTime(data))
+                await sleep(randomActionTime(configs))
 
                 await page.waitForSelector("#publish-confirm-popover-digital-done > span > input")
                 await sleep(3000)
@@ -552,7 +551,7 @@ async function run(data) {
             // Upload hardcover 
             await page.waitForSelector("span[data-action=add-hardcover-format]")
             await page.click("span[data-action=add-hardcover-format]")
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.waitForSelector("#save-and-continue-announce")
             await sleep(3000)
             await page.click("#save-and-continue-announce")
@@ -578,7 +577,7 @@ async function run(data) {
 
 
             // Click Preview
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.evaluate(() => {
                 document.querySelector('#print-preview-announce').click();
             });
@@ -594,35 +593,34 @@ async function run(data) {
 
             await page.waitForSelector("#printpreview_approve_button_enabled > span", { timeout: 300000 })
             await sleep(10000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#printpreview_approve_button_enabled > span")
             await page.waitForSelector("#save-and-continue")
             await sleep(3000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#save-and-continue")
             await page.waitForSelector(".price-input")
             await sleep(3000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             let hardcoverPrice = book['Price Harcover'].toString()
-            await page.type("#data-pricing-print-us-price-input > input", hardcoverPrice, { delay: randomTypeTime(data) })
+            await page.type("#data-pricing-print-us-price-input > input", hardcoverPrice, { delay: randomTypeTime(configs) })
             await sleep(7000)
-            await sleep(randomActionTime(data))
+            await sleep(randomActionTime(configs))
             await page.click("#save-and-publish-announce")
             await page.waitForSelector("#publish-confirm-popover-hardcover-done")
             console.log(`--- Upload ${book["book title"]} done ---`)
             
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  OK! ---`
             await appendLog(logFilePath, logAppend)
-            await sleep(randomUploadInterval(data)) // delay các lần up
+            await sleep(randomUploadInterval(configs)) // delay các lần up
         } catch (error) {
+            console.log(error)
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message}`
             await appendLog(logFilePath, logAppend)
         }
 
     }
-
-    await browser.close() // Done 
-
+     
 }
 
 module.exports = { run }
