@@ -118,7 +118,7 @@ async function saveSelectedAccounts() {
 
     let savePath = path.join(__dirname, "configs.json");
     await fsPromise.writeFile(savePath, JSON.stringify(configs, null, 2), "utf-8");
-    // runNodeFile()
+    runNodeFile()
 
 
 }
