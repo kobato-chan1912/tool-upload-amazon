@@ -209,7 +209,7 @@ async function run(data) {
         await page.click("#auth-get-new-otp-link")
         await page.waitForSelector("input[name=otpDeviceContext]", { timeout: 20000 })
         await sleep(3000)
-        await page.click("input[name=otpDeviceContext]")
+        await page.click(".auth-TOTP input[name=otpDeviceContext]")
         await sleep(3000)
         await page.click("#auth-send-code")
 
