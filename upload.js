@@ -264,6 +264,11 @@ async function run(data) {
     for (let book of data.books) {
 
         try {
+
+
+            let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
+            await appendLog(logFilePath, startUploadLog)
+
             // 1 - Upload paperback
 
             await page.goto('https://kdp.amazon.com/en_US/title-setup/paperback/new/details?ref_=cr_ti/');

@@ -94,7 +94,7 @@ async function saveSelectedAccounts() {
     }));
 
     let logFileName = `log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`;
-    let logFilePath = path.join(__dirname, logFileName);
+    let logFilePath = path.join("logs/" + logFileName);
 
     let configs = {
         accountsFile: getFilePath("account_file"),
