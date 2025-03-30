@@ -192,6 +192,7 @@ async function run(data) {
     try {
 
         // login
+        await page.goto("https://kdp.amazon.com/bookshelf?language=en_US")
         await sleep(3000)
         await clearInput(page, "#ap_email")
         await sleep(2000)
