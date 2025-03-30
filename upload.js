@@ -607,7 +607,8 @@ async function run(data, configs) {
             await sleep(7000)
             await sleep(randomActionTime(configs))
             await page.click("#save-and-publish-announce")
-            await page.waitForSelector("#publish-confirm-popover-hardcover-done")
+            // await page.waitForSelector("#publish-confirm-popover-hardcover-done")
+            await sleep(30000)
             console.log(`--- Upload ${book["book title"]} done ---`)
             
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  OK! ---`
