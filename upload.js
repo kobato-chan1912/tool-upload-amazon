@@ -176,13 +176,12 @@ async function run(data) {
 
     }
 
+    const page = await browser.newPage();
+    page.setDefaultTimeout(300000);
 
     try {
 
         // login
-        const page = await browser.newPage();
-        page.setDefaultTimeout(300000);
-        await page.goto("https://kdp.amazon.com/bookshelf?language=en_US")
         await sleep(3000)
         await page.type("#ap_email", data.email, { delay: 50 })
         await page.click("#continue")
