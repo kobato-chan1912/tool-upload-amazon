@@ -2,7 +2,7 @@ const Genlogin = require('./Genlogin');
 const puppeteer = require('puppeteer-core');
 const sleep = ms => new Promise(res => setTimeout(res, ms));
 const speakeasy = require('speakeasy');
-
+const axios = require("axios")
 
 function processCategories(text) {
     // Remove "Books ›" from the text
@@ -140,16 +140,41 @@ async function solveCategory(page, categoryText) {
 
 
 async function run(data) {
-    const genlogin = new Genlogin("");
-    const { wsEndpoint } = await genlogin.runProfile(data.gpm_id)
 
-    const browser = await puppeteer.connect({
-        browserWSEndpoint: wsEndpoint,
-        ignoreHTTPSErrors: true,
-        defaultViewport: false
-    });
-    const page = await browser.newPage();
-    page.setDefaultTimeout(300000);
+    if (process.platform === 'win32') {
+
+        // Windows - Using GPM-Login 
+
+        const API_BASE_URL = "http://127.0.0.1:19995/api/v3"; // Địa chỉ API GPM-Login
+        const startResponse = await axios.get(`${API_BASE_URL}/profiles/start/${profile.id}`);
+        if (!startResponse.data.success) {
+            throw new Error(`Không thể mở profile ${profile.name}: ${startResponse.data.message}`);
+        }
+
+        const { remote_debugging_address } = startResponse.data.data;
+        await new Promise(resolve => setTimeout(resolve, 5000));
+        const browser = await puppeteer.connect({
+            browserURL: `http://${remote_debugging_address}`,
+            defaultViewport: null,
+        });
+        const page = await browser.newPage();
+        page.setDefaultTimeout(300000);
+
+    } else {
+        // MAC OS - Using GenLogin
+
+        const genlogin = new Genlogin("");
+        const { wsEndpoint } = await genlogin.runProfile(data.gpm_id)
+
+        const browser = await puppeteer.connect({
+            browserWSEndpoint: wsEndpoint,
+            ignoreHTTPSErrors: true,
+            defaultViewport: false
+        });
+        const page = await browser.newPage();
+        page.setDefaultTimeout(300000);
+    }
+
 
     try {
 
