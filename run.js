@@ -21,7 +21,7 @@ async function run() {
         }
 
         // 3️⃣ Sử dụng p-limit để chạy đa luồng
-        let limit = pLimit(data.length); // Số luồng = số phần tử trong `data`
+        let limit = pLimit(configs.threads); // Số luồng = số phần tử trong `data`
 
         let uploadTasks = data.map(account =>
             limit(() => upload.run(account, configs))

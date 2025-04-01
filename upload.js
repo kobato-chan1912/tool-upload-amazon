@@ -177,6 +177,19 @@ async function solveCategory(page, categoryText) {
 }
 
 
+function getOTP(rawSecret) {
+    // const rawSecret = data.secret;
+
+    // Loại bỏ dấu cách
+    const secret = rawSecret.replace(/\s+/g, '');
+    const token = speakeasy.totp({
+        secret: secret,
+        encoding: 'base32'
+    });
+
+    return token;
+}
+
 async function run(data, configs) {
     const logFilePath = configs.logFile;
     const profileID = data.gpm_id
@@ -220,6 +233,8 @@ async function run(data, configs) {
     try {
 
         // login
+        await page.goto("https://kdp.amazon.com/en_US/")
+        await sleep(5000)
         await page.goto("https://kdp.amazon.com/bookshelf?language=en_US")
         await sleep(3000)
         await clearInput(page, "#ap_email")
@@ -233,14 +248,21 @@ async function run(data, configs) {
         await page.type("#ap_password", data.password, { delay: randomTypeTime(configs) })
         await page.click("#signInSubmit")
         await page.waitForSelector("#auth-get-new-otp-link", { timeout: 20000 })
-        await sleep(3000)
-        await page.click("#auth-get-new-otp-link")
-        await page.waitForSelector("input[name=otpDeviceContext]", { timeout: 20000 })
-        await sleep(3000)
-        await page.click(".auth-TOTP input[name=otpDeviceContext]")
-        await sleep(3000)
-        await page.click("#auth-send-code")
+        let typeMode = await page.$eval('#auth-mfa-form > div > div > p', el => el.innerText)
+        if (!typeMode.includes("Authenticator App")) {
+            // 
 
+            await page.click("#auth-get-new-otp-link")
+            await page.waitForSelector("input[name=otpDeviceContext]", { timeout: 20000 })
+            await sleep(3000)
+            await page.click(".auth-TOTP input[name=otpDeviceContext]")
+            await sleep(3000)
+            await page.click("#auth-send-code")
+
+        }
+
+        await page.waitForSelector("#auth-mfa-otpcode", { timeout: 20000 })
+        await sleep(3000)
         const rawSecret = data.secret;
 
         // Loại bỏ dấu cách
@@ -250,8 +272,7 @@ async function run(data, configs) {
             encoding: 'base32'
         });
 
-        await page.waitForSelector("#auth-mfa-otpcode", { timeout: 20000 })
-        await sleep(3000)
+
         await page.type("#auth-mfa-otpcode", token, { delay: randomTypeTime(configs) })
         await page.click("#auth-signin-button")
         await sleep(10000)
@@ -266,6 +287,7 @@ async function run(data, configs) {
 
 
             let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
+            console.log(startUploadLog)
             await appendLog(logFilePath, startUploadLog)
 
             // 1 - Upload paperback
@@ -610,7 +632,7 @@ async function run(data, configs) {
             // await page.waitForSelector("#publish-confirm-popover-hardcover-done")
             await sleep(30000)
             console.log(`--- Upload ${book["book title"]} done ---`)
-            
+
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  OK! ---`
             await appendLog(logFilePath, logAppend)
             await sleep(randomUploadInterval(configs)) // delay các lần up
@@ -621,7 +643,7 @@ async function run(data, configs) {
         }
 
     }
-     
+
 }
 
 module.exports = { run }

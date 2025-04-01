@@ -94,12 +94,19 @@ async function saveSelectedAccounts() {
     }));
 
     let logFileName = `log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`;
-    let logFilePath = path.join("logs/" + logFileName);
+
+    let logFilePath;
+    if (process.platform === 'win32') {
+        logFilePath = path.join("logs/" + logFileName); // built
+    } else {
+        logFilePath = path.join(__dirname, "logs/" + logFileName); // not built
+    }
 
     let configs = {
         accountsFile: getFilePath("account_file"),
         booksFile: booksPath,
         data: resultFilter,
+        threads: parseInt(document.getElementById("threads").value) || 1,
         typingTime: {
             min: Number(document.getElementById("typing_min").value) || 0,
             max: Number(document.getElementById("typing_max").value) || 0
