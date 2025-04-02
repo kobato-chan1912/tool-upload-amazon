@@ -285,7 +285,7 @@ async function run(data, configs) {
 
         try {
 
-            
+
             let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
             console.log(startUploadLog)
             await appendLog(logFilePath, startUploadLog)
@@ -299,7 +299,7 @@ async function run(data, configs) {
             await page.waitForSelector("#data-print-book-title")
             await sleep(randomActionTime(configs))
 
-
+            
             // await page.goto('https://kdp.amazon.com/en_US/title-setup/paperback/new/details?ref_=cr_ti/');
 
             // Set screen size.
@@ -497,7 +497,7 @@ async function run(data, configs) {
             /////// Upload Kindle Book ////// 
 
 
-            if (book['manuscript ebook'] !== '' && book['manuscript ebook']  !== undefined  ){
+            if (book['manuscript ebook'] !== '') {
                 await sleep(randomActionTime(configs))
                 await page.click("span[data-action=add-digital-format]")
                 await page.waitForSelector("#save-and-continue-announce")
@@ -581,7 +581,7 @@ async function run(data, configs) {
 
 
 
-            await page.goto("https://kdp.amazon.com/en_US/bookshelf")
+            await page.goto("https://kdp.amazon.com/en_US/bookshelf?ref_=kdp_kdp_TAC_TN_bs")
 
             // Upload hardcover 
             await page.waitForSelector("span[data-action=add-hardcover-format]")
@@ -649,7 +649,6 @@ async function run(data, configs) {
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  OK! ---`
             await appendLog(logFilePath, logAppend)
             await sleep(randomUploadInterval(configs)) // delay các lần up
-            await page.goto("https://kdp.amazon.com/en_US/bookshelf")
         } catch (error) {
             console.log(error)
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message}`
