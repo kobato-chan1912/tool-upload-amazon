@@ -285,7 +285,7 @@ async function run(data, configs) {
 
         try {
 
-            
+            await page.goto("https://kdp.amazon.com/en_US/bookshelf")
             let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
             console.log(startUploadLog)
             await appendLog(logFilePath, startUploadLog)
@@ -649,7 +649,6 @@ async function run(data, configs) {
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  OK! ---`
             await appendLog(logFilePath, logAppend)
             await sleep(randomUploadInterval(configs)) // delay các lần up
-            await page.goto("https://kdp.amazon.com/en_US/bookshelf")
         } catch (error) {
             console.log(error)
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message}`
