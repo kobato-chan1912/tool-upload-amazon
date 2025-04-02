@@ -292,7 +292,15 @@ async function run(data, configs) {
 
             // 1 - Upload paperback
 
-            await page.goto('https://kdp.amazon.com/en_US/title-setup/paperback/new/details?ref_=cr_ti/');
+            await page.click("#create-new-experience-button a")
+            await page.waitForSelector("#main-0")
+            await sleep(randomActionTime(configs))
+            await page.click("#main-0 > div.a-row.a-spacing-extra-large > div > div > div > div.a-row.a-spacing-double-large.a-spacing-top-medium > div > div:nth-child(2) > div > span > span > button")
+            await page.waitForSelector("#data-print-book-title")
+            await sleep(randomActionTime(configs))
+
+            
+            // await page.goto('https://kdp.amazon.com/en_US/title-setup/paperback/new/details?ref_=cr_ti/');
 
             // Set screen size.
             // await page.setViewport({ width: 1280, height: 720 });

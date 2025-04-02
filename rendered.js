@@ -83,14 +83,26 @@ async function saveSelectedAccounts() {
     let selectedAccounts = window.loadedAccounts.filter(acc => selectedEmails.includes(acc["tài khoản"]));
 
     let booksPath = getFilePath("data_file");
+
+
+    const cleanString = str => typeof str === "string" ? str.normalize().replace(/\p{C}/gu, '') : str;
+    const cleanObject = obj => {
+        return Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => [key, cleanString(value)])
+        );
+    };
+    
+    
     let booksData = excel.readExcelFile(booksPath);
+    let cleanedBooksData = booksData.map(cleanObject);
+
 
     let resultFilter = selectedAccounts.map(account => ({
         email: account["tài khoản"],
         gpm_id: account.gpm_id,
         password: account["mật khẩu"],
         secret: account["2FA"],
-        books: booksData.filter(item => item.email === account["tài khoản"])
+        books: cleanedBooksData.filter(item => item.email === account["tài khoản"])
     }));
 
     let logFileName = `log_${new Date().toISOString().replace(/[:.]/g, "-")}.txt`;
