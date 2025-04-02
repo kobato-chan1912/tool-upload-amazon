@@ -311,35 +311,6 @@ async function run(data, configs) {
             }, book["description"]);
             await sleep(randomActionTime(configs))
 
-
-            // Chọn non-public
-            await page.click("#non-public-domain")
-            await sleep(randomActionTime(configs))
-
-            // Adult
-            await page.click('#data-print-book-is-adult-content > div > div > fieldset > div:nth-child(2) > div > label > input[type=radio]') // nếu adult thì 0
-
-
-            // Chọn category
-
-            await sleep(5000)
-            let categoryText = book["category"]
-            await solveCategory(page, categoryText)
-
-            // Xư rlys lowContent
-            let lowContent = book["Low content"];
-            if (lowContent == "YES") {
-                await page.click("#data-view-is-lcb")
-            }
-
-            let largePrint = book["Large Print"];
-            if (largePrint == "YES") {
-                await page.click("#data-print-book-large-print")
-            }
-
-
-            // keyword
-
             await page.type("#data-print-book-keywords-0", book["keyword1"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
             await page.type("#data-print-book-keywords-1", book["keyword2"], { delay: randomTypeTime(configs) })
@@ -354,14 +325,38 @@ async function run(data, configs) {
             await sleep(randomActionTime(configs))
             await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(configs) })
 
-            
+            // Chọn non-public
+            await page.click("#non-public-domain")
+            await sleep(randomActionTime(configs))
+
+            // Cài đặt adult mode
+            let adult = book["adult"];
+            if (adult == "NO") {
+                await page.click('#data-print-book-is-adult-content > div > div > fieldset > div:nth-child(2) > div > label > input[type=radio]') // nếu adult thì 0
+            }
+
+
+
+            // Chọn category
+
+            await sleep(5000)
+            let categoryText = book["category"]
+            await solveCategory(page, categoryText)
 
 
 
 
+            // Xư rlys lowContent
+            let lowContent = book["Low content"];
+            if (lowContent == "YES") {
+                await page.click("#data-view-is-lcb")
+            }
 
+            let largePrint = book["Large Print"];
+            if (largePrint == "YES") {
+                await page.click("#data-print-book-large-print")
+            }
 
-            
 
             // Click save
             await page.click("#save-and-continue-announce")
