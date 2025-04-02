@@ -286,6 +286,7 @@ async function run(data, configs) {
         try {
 
             await page.goto("https://kdp.amazon.com/en_US/bookshelf")
+            await sleep(randomActionTime(configs))
             let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
             console.log(startUploadLog)
             await appendLog(logFilePath, startUploadLog)
