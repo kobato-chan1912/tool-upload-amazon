@@ -70,6 +70,52 @@ function processCategories(text) {
     return result;
 }
 
+async function selectAI(page, text1, text2, text3) {
+    // select 1
+    await page.evaluate(() => {
+
+        const event = new Event('change', { bubbles: true });
+        let select1 = document.querySelector(`select[name=react-aui-0]`)
+        select1.value = "PARTIAL_AND_MINIMAL"
+        select1.dispatchEvent(event)
+
+    });
+
+    await sleep(5000)
+
+    await page.evaluate(() => {
+
+        const event = new Event('change', { bubbles: true });
+        let select2 = document.querySelector(`select[name=react-aui-1]`)
+        select2.value = "FEW_AND_MINIMAL"
+        select2.dispatchEvent(event)
+
+    });
+
+    await sleep(5000)
+
+    await page.evaluate(() => {
+
+        const event = new Event('change', { bubbles: true });
+        let select3 = document.querySelector(`select[name=react-aui-2]`)
+        select3.value = "PARTIAL_AND_MINIMAL"
+        select3.dispatchEvent(event)
+
+    });
+
+    await sleep(5000)
+
+
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-text-tools-prompt]", text1)
+    await sleep(5000)
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-images-tools-prompt]", text2)
+    await sleep(5000)
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-translations-tools-prompt]", text3)
+    await sleep(5000)
+
+}
+
+
 async function selectCategory(page, selectName, textSearch) {
     await page.evaluate((selectName, textSearch) => {
         const select = document.querySelector(`select[name="${selectName}"]`);
@@ -363,14 +409,14 @@ async function run(data, configs) {
             await sleep(randomActionTime(configs))
             await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(configs) })
 
-            
 
 
 
 
 
 
-            
+
+
 
             // Click save
             await page.click("#save-and-continue-announce")
@@ -403,8 +449,8 @@ async function run(data, configs) {
                     const buttons = document.querySelectorAll('button.a-button-text');
                     for (const btn of buttons) {
                         if (
-                            btn.dataset.width === String(w*100) &&
-                            btn.dataset.height === String(h*100)
+                            btn.dataset.width === String(w * 100) &&
+                            btn.dataset.height === String(h * 100)
                         ) {
                             btn.click();
                             break;
@@ -444,7 +490,18 @@ async function run(data, configs) {
 
             // AI Content - Always NO
 
-            await page.click('div[data-a-accordion-row-name="no"] .a-accordion-row-a11y a')
+
+            let AIContent = book["AI content"]
+            let ai1 = book["AI 1"]
+            let ai2 = book["AI 2"]
+            let ai3 = book["AI 3"]
+            if (AIContent == "NO") {
+                await page.click('div[data-a-accordion-row-name="no"] .a-accordion-row-a11y a')
+            } else {
+                await page.click('div[data-a-accordion-row-name="yes"] .a-accordion-row-a11y a')
+                await sleep(5000)
+                await selectAI(page, ai1, ai2, ai3)
+            }
 
 
             // Preview 
@@ -470,7 +527,7 @@ async function run(data, configs) {
             } catch (error) {
             }
 
-            
+
             await page.waitForSelector("#printpreview_approve_button_enabled > span", { timeout: 300000 })
             await sleep(10000)
             await sleep(randomActionTime(configs))
@@ -508,7 +565,7 @@ async function run(data, configs) {
             /////// Upload Kindle Book ////// 
 
 
-            if (book['manuscript ebook'] !== '' && book['manuscript ebook']  !== undefined  ){
+            if (book['manuscript ebook'] !== '' && book['manuscript ebook'] !== undefined) {
                 await sleep(randomActionTime(configs))
                 await page.click("span[data-action=add-digital-format]")
                 await page.waitForSelector("#save-and-continue-announce")
@@ -608,7 +665,7 @@ async function run(data, configs) {
             // bleed setting for hardcover 
             await sleep(10000)
             await sleep(randomActionTime(configs))
-            
+
             if (lowContent == "NO") {
                 await page.click("#section-isbn-v2 .a-button-input")
                 await sleep(10000)
@@ -631,15 +688,15 @@ async function run(data, configs) {
                     const buttons = document.querySelectorAll('button.a-button-text');
                     for (const btn of buttons) {
                         if (
-                            btn.dataset.width === String(w*100) &&
-                            btn.dataset.height === String(h*100)
+                            btn.dataset.width === String(w * 100) &&
+                            btn.dataset.height === String(h * 100)
                         ) {
                             btn.click();
                             break;
                         }
                     }
                 }, formatTrim.w, formatTrim.h);
-            
+
                 await sleep(10000)
             }
 
@@ -669,8 +726,15 @@ async function run(data, configs) {
             await page.waitForSelector("#data-print-book-publisher-cover-file-upload-success", { visible: true })
             await sleep(5000)
 
-            // NO AI
-            await page.click("#section-generative-ai > div > div.a-column.a-span10.a-span-last > div > div > div > span > div:nth-child(3) > div > div:nth-child(2) > div > div > a")
+            // AI Content
+            if (AIContent == "NO") {
+                await page.click('div[data-a-accordion-row-name="no"] .a-accordion-row')
+            } else {
+                await page.click('div[data-a-accordion-row-name="yes"] .a-accordion-row')
+                await sleep(5000)
+                await selectAI(page, ai1, ai2, ai3)
+                await sleep(5000)
+            }
 
 
             // Click Preview
