@@ -470,7 +470,7 @@ async function run(data, configs) {
             } catch (error) {
             }
 
-            
+
             await page.waitForSelector("#printpreview_approve_button_enabled > span", { timeout: 300000 })
             await sleep(10000)
             await sleep(randomActionTime(configs))

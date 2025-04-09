@@ -381,37 +381,27 @@ async function run(data, configs) {
 
             if (lowContent == "NO") {
                 await page.click("#section-isbn-v2 .a-button-input")
-                await sleep(10000)
+                await sleep(3000)
                 await sleep(randomActionTime(configs))
                 await page.click("#free-isbn-confirm-button > span > input")
-                await sleep(10000)
+                await page.sleep(10000)
             }
 
             // Click Print Option
 
             let printOption = book["paper type"]
             await page.click(`#a-autoid-${printOption - 1}-announce`)
-            await sleep(5000)
-            await sleep(randomActionTime(configs))
+
 
             let trimSize = book["trim size"]
             let formatTrim = parseTrimSize(trimSize)
             if (formatTrim.w !== 6 || formatTrim.h !== 9) {
                 await page.click("#trim-size-btn-announce")
-                await sleep(10000)
-                await page.evaluate((w, h) => {
-                    const buttons = document.querySelectorAll('button.a-button-text');
-                    for (const btn of buttons) {
-                        if (
-                            btn.dataset.width === String(w*100) &&
-                            btn.dataset.height === String(h*100)
-                        ) {
-                            btn.click();
-                            break;
-                        }
-                    }
-                }, formatTrim.w, formatTrim.h);
-                await sleep(10000)
+                await sleep(3000)
+                await page.type("#inputWidth", formatTrim.w, { delay: randomTypeTime(configs) })
+                await page.type("#inputHeight", formatTrim.h, { delay: randomTypeTime(configs) })
+                await page.click("#a-autoid-11 > span > input")
+                await sleep(3000)
             }
 
             let bleedSetting = book["bleed setting"];
@@ -470,8 +460,8 @@ async function run(data, configs) {
             } catch (error) {
             }
 
-            
-            await page.waitForSelector("#printpreview_approve_button_enabled > span", { timeout: 300000 })
+
+            await page.waitForSelector("#printpreview_approve_button_enabled > span > a")
             await sleep(10000)
             await sleep(randomActionTime(configs))
             await page.click("#printpreview_approve_button_enabled > span > a")
@@ -485,7 +475,7 @@ async function run(data, configs) {
             // Price Input 
 
             await page.waitForSelector(".price-input")
-            await sleep(10000)
+            await sleep(5000)
             let price = book["price paperpack"].toString()
             await page.type("#data-pricing-print-us-price-input > input", price, { delay: randomTypeTime(configs) })
             await sleep(7000)
@@ -564,7 +554,7 @@ async function run(data, configs) {
 
 
                 await page.waitForSelector(".price-input", { timeout: 300000 })
-                await sleep(10000)
+                await sleep(5000)
 
                 //  Chỉnh giá royalty 
                 await sleep(randomActionTime(configs))
@@ -576,7 +566,7 @@ async function run(data, configs) {
                     await page.click("#data-digital-royalty-rate > div > div > fieldset > div.a-radio.a-radio-fancy.form-submit-blacklisted.form-incr-validate-blacklist.jele-binding-disabled.unsaved-changes-ignore.a-spacing-small > label > input[type=radio]")
                 }
 
-                await sleep(10000)
+                await sleep(3000)
                 let priceEbook = book['price_ebook'].toString()
                 await page.type("#data-digital-us-price-input > input", priceEbook, { delay: randomTypeTime(configs) })
                 await sleep(7000)
@@ -601,57 +591,6 @@ async function run(data, configs) {
             await page.waitForSelector("#save-and-continue-announce")
             await sleep(3000)
             await page.click("#save-and-continue-announce")
-
-
-            ///////////////////// Hardcover setting 
-
-            // bleed setting for hardcover 
-            await sleep(10000)
-            await sleep(randomActionTime(configs))
-            
-            if (lowContent == "NO") {
-                await page.click("#section-isbn-v2 .a-button-input")
-                await sleep(10000)
-                await sleep(randomActionTime(configs))
-                await page.click("#free-isbn-confirm-button > span > input")
-                await sleep(10000)
-            }
-
-            // Click Print Option
-
-            let hardCoverPrintOption = book["paper type hardcover"];
-            await page.click(`#a-autoid-${hardCoverPrintOption - 1}-announce`)
-            await sleep(5000)
-            await sleep(randomActionTime(configs))
-
-            if (formatTrim.w !== 6 || formatTrim.h !== 9) {
-                await page.click("#trim-size-btn")
-                await sleep(10000)
-                await page.evaluate((w, h) => {
-                    const buttons = document.querySelectorAll('button.a-button-text');
-                    for (const btn of buttons) {
-                        if (
-                            btn.dataset.width === String(w*100) &&
-                            btn.dataset.height === String(h*100)
-                        ) {
-                            btn.click();
-                            break;
-                        }
-                    }
-                }, formatTrim.w, formatTrim.h);
-            
-                await sleep(10000)
-            }
-
-            await sleep(randomActionTime(configs))
-            await page.click(`#a-autoid-${bleedSetting + 3}-announce`)
-
-
-
-
-            /////////////////////////// 
-
-
 
 
             let hardcoverScript = book['manuscript Hard Cover']
