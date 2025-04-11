@@ -274,7 +274,7 @@ async function run(data, configs) {
     }
 
     const page = await browser.newPage();
-    page.setDefaultTimeout(300000*3);
+    page.setDefaultTimeout(300000);
 
     try {
 
