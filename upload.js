@@ -274,7 +274,7 @@ async function run(data, configs) {
     }
 
     const page = await browser.newPage();
-    page.setDefaultTimeout(300000*3);
+    page.setDefaultTimeout(300000 * 3);
 
     try {
 
@@ -286,23 +286,26 @@ async function run(data, configs) {
         await clearInput(page, "#ap_email")
         await sleep(2000)
         await page.type("#ap_email", data.email, { delay: randomTypeTime(configs) })
+        await sleep(3000)
         await page.click("#continue")
         await page.waitForSelector("#ap_password", { timeout: 20000 })
         await sleep(3000)
         await clearInput(page, "#ap_password")
         await sleep(2000)
         await page.type("#ap_password", data.password, { delay: randomTypeTime(configs) })
+        await sleep(5000)
         await page.click("#signInSubmit")
+        await sleep(5000)
         await page.waitForSelector("#auth-get-new-otp-link", { timeout: 20000 })
         let typeMode = await page.$eval('#auth-mfa-form > div > div > p', el => el.innerText)
         if (!typeMode.includes("Authenticator App")) {
             // 
-
+            await sleep(5000)
             await page.click("#auth-get-new-otp-link")
             await page.waitForSelector("input[name=otpDeviceContext]", { timeout: 20000 })
-            await sleep(3000)
+            await sleep(5000)
             await page.click(".auth-TOTP input[name=otpDeviceContext]")
-            await sleep(3000)
+            await sleep(5000)
             await page.click("#auth-send-code")
 
         }
@@ -313,10 +316,26 @@ async function run(data, configs) {
 
         // Loại bỏ dấu cách
         const secret = rawSecret.replace(/\s+/g, '');
-        const token = speakeasy.totp({
+        let token = speakeasy.totp({
             secret: secret,
             encoding: 'base32'
         });
+
+        const timeStep = 30;
+        const currentTime = Math.floor(Date.now() / 1000); // thời gian hiện tại tính bằng giây
+        const secondsElapsed = currentTime % timeStep;
+        const secondsLeft = timeStep - secondsElapsed;
+        if (secondsLeft < 5) {
+
+            await sleep(10000)
+            // regenerate
+            token = speakeasy.totp({
+                secret: secret,
+                encoding: 'base32'
+            });
+
+        }
+
 
 
         await page.type("#auth-mfa-otpcode", token, { delay: randomTypeTime(configs) })
@@ -357,7 +376,7 @@ async function run(data, configs) {
             await sleep(randomActionTime(configs))
             await page.type("#data-print-book-subtitle", book["sub title"], { delay: randomTypeTime(configs) })
 
-
+            await sleep(randomActionTime(configs))
             await page.type("#data-print-book-primary-author-last-name", book["author (last name)"], { delay: 50 })
             await sleep(randomActionTime(configs))
 
@@ -516,7 +535,6 @@ async function run(data, configs) {
             });
 
             try {
-
                 await page.waitForSelector("#print-preview-confirm-button-announce", { timeout: 5000 })
                 await sleep(5000)
                 await page.evaluate(() => {
