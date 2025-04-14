@@ -453,9 +453,10 @@ async function run(data, configs) {
             await sleep(randomActionTime(configs))
             await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(configs) })
 
+
+
             await sleep(5000)
             await sleep(randomActionTime(configs))
-
 
 
 

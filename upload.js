@@ -455,7 +455,8 @@ async function run(data, configs) {
 
 
 
-
+            await sleep(5000)
+            await sleep(randomActionTime(configs))
 
 
 
