@@ -97,36 +97,36 @@ const AISelector = {
 
 async function selectAI(page, select1V, select2V, select3V, text1, text2, text3) {
     // select 1
-    await page.evaluate((select1V) => {
+    await page.evaluate((AISelector, select1V) => {
 
         const event = new Event('change', { bubbles: true });
         let select1 = document.querySelector(`select[name=react-aui-0]`)
         select1.value = AISelector.select1[select1V]
         select1.dispatchEvent(event)
 
-    }, select1V);
+    }, AISelector, select1V);
 
     await sleep(5000)
 
-    await page.evaluate((select2V) => {
+    await page.evaluate((AISelector, select2V) => {
 
         const event = new Event('change', { bubbles: true });
         let select2 = document.querySelector(`select[name=react-aui-1]`)
         select2.value = AISelector.select2[select2V]
         select2.dispatchEvent(event)
 
-    }, select2V);
+    }, AISelector, select2V);
 
     await sleep(5000)
 
-    await page.evaluate((select3V) => {
+    await page.evaluate((AISelector, select3V) => {
 
         const event = new Event('change', { bubbles: true });
         let select3 = document.querySelector(`select[name=react-aui-2]`)
         select3.value = AISelector.select3[select3V]
         select3.dispatchEvent(event)
 
-    }, select3V);
+    }, AISelector, select3V);
 
     await sleep(5000)
 
@@ -831,8 +831,9 @@ async function run(data, configs) {
             await appendLog(logFilePath, logAppend)
             await sleep(randomUploadInterval(configs)) // delay các lần up
         } catch (error) {
-            console.log(error)
-            let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message}`
+            const stackLine = error.stack.split('\n')[1]?.trim(); // Dòng đầu tiên trong stack trace
+
+            let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message} at ${stackLine}`
             await appendLog(logFilePath, logAppend)
         }
 
@@ -840,7 +841,7 @@ async function run(data, configs) {
 
 
     await sleep(10000)
-    await browser.close()
+    // await browser.close()
 
 }
 

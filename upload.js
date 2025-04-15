@@ -14,6 +14,23 @@ async function appendLog(filePath, text) {
     }
 }
 
+async function getOtp(secret) {
+    try {
+      const response = await axios.get('https://otp.streaming-go.shop/', {
+        params: { secret }
+      });
+  
+      let rsp = response.data;
+      return rsp.otp;
+    } catch (error) {
+      return {
+        status: 'error',
+        message: error.response?.data?.message || error.message
+      };
+    }
+  }
+  
+
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -97,36 +114,36 @@ const AISelector = {
 
 async function selectAI(page, select1V, select2V, select3V, text1, text2, text3) {
     // select 1
-    await page.evaluate((select1V) => {
+    await page.evaluate((AISelector, select1V) => {
 
         const event = new Event('change', { bubbles: true });
         let select1 = document.querySelector(`select[name=react-aui-0]`)
         select1.value = AISelector.select1[select1V]
         select1.dispatchEvent(event)
 
-    }, select1V);
+    }, AISelector, select1V);
 
     await sleep(5000)
 
-    await page.evaluate((select2V) => {
+    await page.evaluate((AISelector, select2V) => {
 
         const event = new Event('change', { bubbles: true });
         let select2 = document.querySelector(`select[name=react-aui-1]`)
         select2.value = AISelector.select2[select2V]
         select2.dispatchEvent(event)
 
-    }, select2V);
+    }, AISelector, select2V);
 
     await sleep(5000)
 
-    await page.evaluate((select3V) => {
+    await page.evaluate((AISelector, select3V) => {
 
         const event = new Event('change', { bubbles: true });
         let select3 = document.querySelector(`select[name=react-aui-2]`)
         select3.value = AISelector.select3[select3V]
         select3.dispatchEvent(event)
 
-    }, select3V);
+    }, AISelector, select3V);
 
     await sleep(5000)
 
@@ -248,18 +265,7 @@ async function solveCategory(page, categoryText) {
 }
 
 
-function getOTP(rawSecret) {
-    // const rawSecret = data.secret;
 
-    // Loại bỏ dấu cách
-    const secret = rawSecret.replace(/\s+/g, '');
-    const token = speakeasy.totp({
-        secret: secret,
-        encoding: 'base32'
-    });
-
-    return token;
-}
 
 async function run(data, configs) {
     const logFilePath = configs.logFile;
@@ -303,6 +309,8 @@ async function run(data, configs) {
 
     try {
 
+        
+
         // login
         await page.goto("https://kdp.amazon.com/en_US/")
         await sleep(5000)
@@ -340,11 +348,8 @@ async function run(data, configs) {
         const rawSecret = data.secret;
 
         // Loại bỏ dấu cách
-        const secret = rawSecret.replace(/\s+/g, '');
-        let token = speakeasy.totp({
-            secret: secret,
-            encoding: 'base32'
-        });
+        // const secret = rawSecret.replace(/\s+/g, '');
+        let token = await getOtp(rawSecret)
 
         const timeStep = 30;
         const currentTime = Math.floor(Date.now() / 1000); // thời gian hiện tại tính bằng giây
@@ -354,10 +359,7 @@ async function run(data, configs) {
 
             await sleep(10000)
             // regenerate
-            token = speakeasy.totp({
-                secret: secret,
-                encoding: 'base32'
-            });
+            token = await getOtp(rawSecret)
 
         }
 
@@ -831,8 +833,9 @@ async function run(data, configs) {
             await appendLog(logFilePath, logAppend)
             await sleep(randomUploadInterval(configs)) // delay các lần up
         } catch (error) {
-            console.log(error)
-            let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message}`
+            const stackLine = error.stack.split('\n')[1]?.trim(); // Dòng đầu tiên trong stack trace
+
+            let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed: ${error.message} at ${stackLine}`
             await appendLog(logFilePath, logAppend)
         }
 
@@ -840,7 +843,7 @@ async function run(data, configs) {
 
 
     await sleep(10000)
-    await browser.close()
+    // await browser.close()
 
 }
 

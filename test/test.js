@@ -1,6 +1,6 @@
 const speakeasy = require('speakeasy');
 
-const rawSecret = 'SVHK FWOC ZBD4 4OAZ WAOL TTN2 DX4K YCAD NEM7 FJ3X RNHK FQX2 SDWA';
+const rawSecret = 'N4W2 SGU3 6UZ6 EWGC XEBF FQFY OEMT 5BHH U4BU WINE MSPP SYNE QVBA';
 
 // Loại bỏ dấu cách
 const secret = rawSecret.replace(/\s+/g, '');
