@@ -14,31 +14,22 @@ async function appendLog(filePath, text) {
     }
 }
 
-
-async function typeWithRandomDelay(page, config, selector, text) {
-    for (let char of text) {
-        await page.type(selector, char);
-        const delay = await randomTypeTime(config);
-        await sleep(delay);
-    }
-}
-
 async function getOtp(secret) {
     try {
-        const response = await axios.get('https://otp.streaming-go.shop/', {
-            params: { secret }
-        });
-
-        let rsp = response.data;
-        return rsp.otp;
+      const response = await axios.get('https://otp.streaming-go.shop/', {
+        params: { secret }
+      });
+  
+      let rsp = response.data;
+      return rsp.otp;
     } catch (error) {
-        return {
-            status: 'error',
-            message: error.response?.data?.message || error.message
-        };
+      return {
+        status: 'error',
+        message: error.response?.data?.message || error.message
+      };
     }
-}
-
+  }
+  
 
 
 function getRandomInt(min, max) {
@@ -104,14 +95,14 @@ const AISelector = {
         2: "PARTIAL_AND_EXTENSIVE",
         3: "ENTIRE_AND_MINIMAL",
         4: "ENTIRE_AND_EXTENSIVE"
-    },
+    }, 
     select2: {
-        0: "NONE",
+        0: "NONE", 
         1: "FEW_AND_MINIMAL",
         2: "FEW_AND_EXTENSIVE",
         3: "MANY_AND_MINIMAL",
         4: "MANY_AND_EXTENSIVE"
-    },
+    }, 
     select3: {
         0: "NONE",
         1: "PARTIAL_AND_MINIMAL",
@@ -123,11 +114,8 @@ const AISelector = {
 
 async function selectAI(page, select1V, select2V, select3V, text1, text2, text3) {
     // select 1
-    await page.evaluate(async (AISelector, select1V) => {
-        const buttons = document.querySelectorAll('.a-button-text.a-declarative');
-        buttons[0].click()
-        await new Promise(res => setTimeout(res, 5000));
-        document.querySelector("#section-generative-ai > div > div.a-column.a-span2 > h4").click()
+    await page.evaluate((AISelector, select1V) => {
+
         const event = new Event('change', { bubbles: true });
         let select1 = document.querySelector(`select[name=react-aui-0]`)
         select1.value = AISelector.select1[select1V]
@@ -137,12 +125,7 @@ async function selectAI(page, select1V, select2V, select3V, text1, text2, text3)
 
     await sleep(5000)
 
-    await page.evaluate(async (AISelector, select2V) => {
-        const buttons = document.querySelectorAll('.a-button-text.a-declarative');
-        buttons[1].click()
-        await new Promise(res => setTimeout(res, 5000));
-        document.querySelector("#section-generative-ai > div > div.a-column.a-span2 > h4").click()
-
+    await page.evaluate((AISelector, select2V) => {
 
         const event = new Event('change', { bubbles: true });
         let select2 = document.querySelector(`select[name=react-aui-1]`)
@@ -153,11 +136,7 @@ async function selectAI(page, select1V, select2V, select3V, text1, text2, text3)
 
     await sleep(5000)
 
-    await page.evaluate(async (AISelector, select3V) => {
-        const buttons = document.querySelectorAll('.a-button-text.a-declarative');
-        buttons[2].click()
-        await new Promise(res => setTimeout(res, 5000));
-        document.querySelector("#section-generative-ai > div > div.a-column.a-span2 > h4").click()
+    await page.evaluate((AISelector, select3V) => {
 
         const event = new Event('change', { bubbles: true });
         let select3 = document.querySelector(`select[name=react-aui-2]`)
@@ -168,11 +147,12 @@ async function selectAI(page, select1V, select2V, select3V, text1, text2, text3)
 
     await sleep(5000)
 
-    await page.type("input[aria-labelledby=generative-ai-questionnaire-text-tools-prompt]", text1, { delay: 80 })
+
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-text-tools-prompt]", text1)
     await sleep(5000)
-    await page.type("input[aria-labelledby=generative-ai-questionnaire-images-tools-prompt]", text2, { delay: 80 })
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-images-tools-prompt]", text2)
     await sleep(5000)
-    await page.type("input[aria-labelledby=generative-ai-questionnaire-translations-tools-prompt]", text3, { delay: 80 })
+    await page.type("input[aria-labelledby=generative-ai-questionnaire-translations-tools-prompt]", text3)
     await sleep(5000)
 
 }
@@ -336,14 +316,14 @@ async function run(data, configs) {
         await sleep(3000)
         await clearInput(page, "#ap_email")
         await sleep(2000)
-        await typeWithRandomDelay(page, configs, "#ap_email", data.email)
+        await page.type("#ap_email", data.email, { delay: randomTypeTime(configs) })
         await sleep(3000)
         await page.click("#continue")
         await page.waitForSelector("#ap_password", { timeout: 20000 })
         await sleep(3000)
         await clearInput(page, "#ap_password")
         await sleep(2000)
-        await typeWithRandomDelay(page, configs, "#ap_password", data.password)
+        await page.type("#ap_password", data.password, { delay: randomTypeTime(configs) })
         await sleep(5000)
         await page.click("#signInSubmit")
         await sleep(5000)
@@ -383,7 +363,7 @@ async function run(data, configs) {
 
 
 
-        await typeWithRandomDelay(page, configs, "#auth-mfa-otpcode", token)
+        await page.type("#auth-mfa-otpcode", token, { delay: randomTypeTime(configs) })
         await page.click("#auth-signin-button")
         await sleep(10000)
 
@@ -416,23 +396,13 @@ async function run(data, configs) {
             // await page.setViewport({ width: 1280, height: 720 });
 
             // Điền book-title 
-            await typeWithRandomDelay(page, configs, "#data-print-book-title", book["book title"])
+            await page.type("#data-print-book-title", book["book title"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-            await typeWithRandomDelay(page, configs, "#data-print-book-subtitle", book["sub title"])
+            await page.type("#data-print-book-subtitle", book["sub title"], { delay: randomTypeTime(configs) })
 
             await sleep(randomActionTime(configs))
-            await typeWithRandomDelay(page, configs, "#data-print-book-primary-author-last-name", book["author (last name)"])
+            await page.type("#data-print-book-primary-author-last-name", book["author (last name)"], { delay: 50 })
             await sleep(randomActionTime(configs))
-            await sleep(5000)
-
-
-            // Focus vào iframe trước
-            const frameHandle = await page.$('iframe.cke_wysiwyg_frame');
-            const frame = await frameHandle.contentFrame();
-            // Focus vào phần body bên trong editor
-            await frame.click("body");
-
-            await sleep(5000)
 
             await page.$eval('#cke_editor1', (el, description) => {
                 CKEDITOR.instances['editor1'].setData(description);
@@ -468,25 +438,19 @@ async function run(data, configs) {
 
             // keyword
 
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-0", book["keyword1"])
+            await page.type("#data-print-book-keywords-0", book["keyword1"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-1", book["keyword2"])
+            await page.type("#data-print-book-keywords-1", book["keyword2"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-2", book["keyword3"])
+            await page.type("#data-print-book-keywords-2", book["keyword3"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-3", book["keyword4"])
+            await page.type("#data-print-book-keywords-3", book["keyword4"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-4", book["keyword5"])
+            await page.type("#data-print-book-keywords-4", book["keyword5"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-5", book["keyword6"])
+            await page.type("#data-print-book-keywords-5", book["keyword6"], { delay: randomTypeTime(configs) })
             await sleep(randomActionTime(configs))
-
-            await typeWithRandomDelay(page, configs, "#data-print-book-keywords-6", book["keyword7"])
+            await page.type("#data-print-book-keywords-6", book["keyword7"], { delay: randomTypeTime(configs) })
 
 
 
@@ -572,7 +536,7 @@ async function run(data, configs) {
 
 
             let AIContent = book["AI content"]
-            let ai1Select = book["AI 1 select"]
+            let ai1Select =book["AI 1 select"]
             let ai2Select = book["AI 2 select"]
             let ai3Select = book["AI 3 select"]
             let ai1 = book["AI 1"]
@@ -628,7 +592,7 @@ async function run(data, configs) {
             await page.waitForSelector(".price-input")
             await sleep(10000)
             let price = book["price paperpack"].toString()
-            await page.type("#data-pricing-print-us-price-input > input", price, { delay: 100 })
+            await page.type("#data-pricing-print-us-price-input > input", price, { delay: randomTypeTime(configs) })
             await sleep(7000)
             await sleep(randomActionTime(configs))
             await page.click("#save-and-publish-announce")
@@ -869,7 +833,7 @@ async function run(data, configs) {
             // const stackLine = error.stack.split('\n')[1]?.trim(); // Dòng đầu tiên trong stack trace
 
             let logAppend = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Failed:\n ${error.stack}`
-
+            
             console.log(logAppend)
             await appendLog(logFilePath, logAppend)
         }
