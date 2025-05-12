@@ -81,27 +81,34 @@ function randomUploadInterval(config) {
 
 
 function processCategories(text) {
-    // Remove "Books ›" or "Kindle Books ›" from the text
-    let cleanedText = text.replace(/Kindle Books ›/g, '').replace(/Books ›/g, '');
+    // Remove "Books ›" from the text
+    let cleanedText;
+    if (!text.includes("Kindle Books ›")) {
+        cleanedText = text.replace(/Books ›/g, '');
 
-    // Split by " | " to handle multiple category strings
+    } else {
+        cleanedText = text.replace(/Kindle Books ›/g, '');
+    }
+
+
+    // Split by " | " to create array
     const categories = cleanedText.split(' | ');
 
+    // Process each category
     const result = categories.map(category => {
         // Replace > with › for consistency and split
-        const parts = category.replace(/>/g, '›').split('›').map(p => p.trim()).filter(p => p !== '');
+        const parts = category.replace(/>/g, '›').split(' › ');
 
-        const categoryObj = {};
+        const categoryObj = {
+            mainCategory: parts[0].trim()
+        };
 
-        if (parts.length === 1) {
-            categoryObj.mainCategory = parts[0];
-            categoryObj.placement = parts[0];
-        } else if (parts.length >= 2) {
-            categoryObj.mainCategory = parts[0];
-            categoryObj.placement = parts[parts.length - 1];
-
-            if (parts.length > 2) {
-                categoryObj.subCategories = parts.slice(1, -1);
+        if (parts.length > 1) {
+            if (parts.length === 2) {
+                categoryObj.placement = parts[1].trim();
+            } else if (parts.length === 3) {
+                categoryObj.subCategory = parts[1].trim();
+                categoryObj.placement = parts[2].trim();
             }
         }
 
@@ -110,7 +117,6 @@ function processCategories(text) {
 
     return result;
 }
-
 
 
 const AISelector = {
@@ -266,42 +272,46 @@ async function solveCategory(page, categoryText) {
     await page.click("#categories-modal-button")
     await sleep(15000)
 
+    let subIndex = 0;
     for (const [index, category] of categoryArr.entries()) {
 
+        let mainIndex = index
+        if (mainIndex == 2) {
+            mainIndex = 4
+        }
+
+        subIndex = subIndex + 2;
+
         if (index !== 0) {
-            await page.click("#react-aui-modal-content-1 > span > div:nth-child(3) > span > span > button"); // Thêm categories mới
-            await sleep(15000);
+            await page.click("#react-aui-modal-content-1 > span > div:nth-child(3) > span > span > button")
+            await sleep(15000)
         }
 
-        // Bước 1: Chọn main category
-        let selects = await page.$$("#react-aui-modal-content-1 select");
-        if (selects.length === 0) continue;
-
-        const mainSelectName = await page.evaluate(el => el.name, selects[0]);
-        await selectCategory(page, mainSelectName, category.mainCategory);
-        await sleep(15000);
-
-        // Bước 2: Chọn subCategories (nếu có)
-        if (category.subCategories && Array.isArray(category.subCategories)) {
-            for (let i = 0; i < category.subCategories.length; i++) {
-                await page.waitForSelector("#react-aui-modal-content-1 select");
-                selects = await page.$$("#react-aui-modal-content-1 select");
-
-                const subIndex = i + 1; // Bỏ qua select đầu tiên (đã dùng cho main)
-                if (subIndex >= selects.length) break;
-
-                const subSelectName = await page.evaluate(el => el.name, selects[subIndex]);
-                await selectCategory(page, subSelectName, category.subCategories[i]);
-                await sleep(15000);
-            }
+        if (category.mainCategory !== undefined) {
+            await selectCategory(page, `react-aui-${mainIndex}`, category.mainCategory)
+            await sleep(15000)
         }
 
-        // Bước 3: Chọn placement
-        await selectPlacement(page, category.placement);
-        await sleep(15000);
+        if (category.mainCategory == "Non-Classifiable" ||
+            category.mainCategory == "Classics" ||
+            category.mainCategory == "General") {
+            await selectPlacement(page, category.mainCategory)
+            await sleep(15000)
+        }
+
+        if (category.subCategory !== undefined) {
+            await selectCategory(page, `react-aui-${subIndex}`, category.subCategory)
+            await sleep(15000)
+        }
+
+        if (category.placement !== undefined) {
+            await selectPlacement(page, category.placement)
+            await sleep(15000)
+        }
+
+
+
     }
-
-
 
     await sleep(5000)
     await page.click("#react-aui-modal-footer-1 > span > span.a-button.a-button-primary > span > button")
@@ -418,15 +428,14 @@ async function run(data, configs) {
     for (let book of data.books) {
 
         try {
-            await page.goto('https://kdp.amazon.com/en_US/bookshelf', { timeout: 300000, waitUntil: 'networkidle2' });
+            await page.goto('https://kdp.amazon.com/en_US/bookshelf', { timeout: 100000, waitUntil: 'networkidle2' });
             await sleep(randomActionTime(configs))
             let startUploadLog = `--- Upload ${book["stt"]} | Upload ${book["book title"]}  Started! ---`
             console.log(startUploadLog)
             await appendLog(logFilePath, startUploadLog)
 
             // 1 - Upload paperback
-            await page.waitForSelector("#create-new-experience-button a")
-            await sleep(5000)
+
             await page.click("#create-new-experience-button a")
             await page.waitForSelector("#main-0")
             await sleep(randomActionTime(configs))
@@ -441,16 +450,7 @@ async function run(data, configs) {
             // await page.setViewport({ width: 1280, height: 720 });
 
             // Điền book-title 
-            await page.type("#data-print-book-title", book["book title"], { delay: 200 })
-            // await typeWithRandomDelay(page, configs, "#data-print-book-title", #data-print-book-title)
-            await sleep(3000)
-            const checkBookTitle = await page.$eval('#data-print-book-title', el => el.value);
-
-            if (checkBookTitle.trim() === '') {
-                // retype
-                await typeWithRandomDelay(page, configs, "#data-print-book-title", book["book title"]);
-            }
-
+            await typeWithRandomDelay(page, configs, "#data-print-book-title", book["book title"])
             await sleep(randomActionTime(configs))
             await typeWithRandomDelay(page, configs, "#data-print-book-subtitle", book["sub title"])
 
@@ -461,8 +461,6 @@ async function run(data, configs) {
 
 
             // Focus vào iframe trước
-            await page.waitForSelector('iframe.cke_wysiwyg_frame')
-            await sleep(5000)
             const frameHandle = await page.$('iframe.cke_wysiwyg_frame');
             const frame = await frameHandle.contentFrame();
             // Focus vào phần body bên trong editor
@@ -811,8 +809,6 @@ async function run(data, configs) {
             // Click Print Option
 
             let hardCoverPrintOption = book["paper type hardcover"];
-            await page.waitForSelector(`#a-autoid-${hardCoverPrintOption - 1}-announce`)
-            await sleep(5000)
             await page.click(`#a-autoid-${hardCoverPrintOption - 1}-announce`)
             await sleep(5000)
             await sleep(randomActionTime(configs))
