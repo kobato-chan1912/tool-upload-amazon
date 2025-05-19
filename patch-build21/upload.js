@@ -276,9 +276,8 @@ async function solveCategory(page, categoryText) {
         // Bước 1: Chọn main category
         let selects = await page.$$("#react-aui-modal-content-1 select");
         if (selects.length === 0) continue;
-        const mainSelectName = await page.evaluate(el => el.name, selects[selects.length - 1]);
 
-        // const mainSelectName = await page.evaluate(el => el.name, selects[selectIndex]);
+        const mainSelectName = await page.evaluate(el => el.name, selects[0]);
         await selectCategory(page, mainSelectName, category.mainCategory);
         await sleep(15000);
 
@@ -290,7 +289,8 @@ async function solveCategory(page, categoryText) {
 
                 const subIndex = i + 1; // Bỏ qua select đầu tiên (đã dùng cho main)
                 if (subIndex >= selects.length) break;
-                const subSelectName = await page.evaluate(el => el.name, selects[selects.length - 1]);
+
+                const subSelectName = await page.evaluate(el => el.name, selects[subIndex]);
                 await selectCategory(page, subSelectName, category.subCategories[i]);
                 await sleep(15000);
             }
@@ -601,7 +601,7 @@ async function run(data, configs) {
             await sleep(3000)
             const coverUpload = await page.waitForSelector('#data-print-book-publisher-cover-file-upload-AjaxInput');
             await coverUpload.uploadFile(coverFile);
-            await page.waitForSelector("#data-print-book-publisher-cover-file-upload-success", { visible: true, timeout: 300000*3*2 })
+            await page.waitForSelector("#data-print-book-publisher-cover-file-upload-success", { visible: true })
             await sleep(5000)
 
             // AI Content - Always NO
@@ -859,7 +859,7 @@ async function run(data, configs) {
             await sleep(3000)
             const hardcoverBook = await page.waitForSelector('#data-print-book-publisher-cover-file-upload-AjaxInput');
             await hardcoverBook.uploadFile(hardcoverFile);
-            await page.waitForSelector("#data-print-book-publisher-cover-file-upload-success", { visible: true, timeout: 300000 * 3 * 2 })
+            await page.waitForSelector("#data-print-book-publisher-cover-file-upload-success", { visible: true })
             await sleep(5000)
 
             // AI Content
